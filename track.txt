@@ -1,0 +1,43 @@
+- Criando Repositorio
+- Criando Arquivo README
+- Inicializando Projeto NestJS
+    -sudo apt install node
+    -sudo apt install npm
+    -curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+    -npx @nestjs/cli new . --package-manager pnpm --skip-install --skip-git (criando projeto em pasta existente)
+    -echo "strict-peer-dependencies=false" > .npmrc
+    -pnpm install
+
+    -Estrutura de pastas
+    src/
+ ├── domain/           # Entidades e regras de negócio puras
+ ├── application/      # Casos de uso e serviços
+ ├── infrastructure/   # Implementações (DB, Redis, Pub/Sub)
+ ├── interfaces/       # Controllers e DTOs (o "mundo exterior")
+ ├── app.module.ts     # O "Root Module" que orquestra as camadas
+ └── main.ts           # O ponto de entrada da aplicação (Bootstrap)
+
+ src/
+├── domain/                  # <--- O Domínio (Camada interna)
+│   ├── user/
+│   │   ├── entities/
+│   │   │   └── user.entity.ts # <--- Pura, com regras de negócio
+│   │   ├── repositories/
+│   │   │   └── user.repository.interface.ts
+│   │   └── value-objects/
+│   ├── ...
+├── application/             # <--- Use Cases, DTOs
+├── infrastructure/          # <--- Mapeamento para BD (TypeORM/Prisma)
+│   ├── persistence/
+│   │   ├── entities/
+│   │   │   └── user.orm-entity.ts # <--- Decorators do DB
+│   │   └── mappers/
+│   │       └── user.mapper.ts
+
+# Install Prisma CLI as a dev dependency
+pnpm install prisma --save-dev
+
+# Install Prisma Client
+pnpm install @prisma/client
+
+ 
