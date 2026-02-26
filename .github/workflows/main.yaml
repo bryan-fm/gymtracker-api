@@ -36,13 +36,13 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/minha-app:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gymtracker-api:${{ github.sha }}
 
       # 4. ATUALIZAÇÃO DO YAML (O segredo do ArgoCD)
       - name: Atualizar Manifesto K8s
         run: |
           # Substitui a imagem antiga pela nova com o hash do commit atual
-          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/minha-app:${{ github.sha }}|g" k8s/deployment.yaml
+          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/gymtracker-api:${{ github.sha }}|g" k8s/deployment.yaml
           
           # Comita a mudança de volta para o repositório
           git config --global user.name "GitHub Action"
