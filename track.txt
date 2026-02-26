@@ -1,43 +1,295 @@
-- Criando Repositorio
-- Criando Arquivo README
-- Inicializando Projeto NestJS
-    -sudo apt install node
-    -sudo apt install npm
-    -curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-    -npx @nestjs/cli new . --package-manager pnpm --skip-install --skip-git (criando projeto em pasta existente)
-    -echo "strict-peer-dependencies=false" > .npmrc
-    -pnpm install
+📘 GymTracker API — Setup & Architectural Foundation Guide
+🎯 Objetivo
 
-    -Estrutura de pastas
-    src/
+Este documento descreve o processo de inicialização do projeto GymTracker API, explicando não apenas os passos técnicos realizados, mas também as decisões arquiteturais por trás de cada escolha.
+
+O foco principal é construir uma base sólida utilizando:
+
+NestJS
+
+Clean Architecture
+
+Domain-driven organization
+
+Prisma (infraestrutura isolada)
+
+Separação clara de responsabilidades
+
+1️⃣ Criação do Repositório
+✔ O que foi feito
+
+Criação do repositório Git
+
+Inicialização do README
+
+Preparação para versionamento desde o início
+
+🧠 Por que isso é importante
+
+Versionamento desde o primeiro commit
+
+Histórico claro da evolução arquitetural
+
+Base para CI/CD futura
+
+Comunicação profissional do projeto
+
+Começar pelo repositório mostra organização e maturidade.
+
+2️⃣ Preparação do Ambiente Node
+sudo apt install node
+sudo apt install npm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+🧠 Por que usar NVM?
+
+Controle de versões do Node
+
+Evita conflitos entre projetos
+
+Facilita replicação do ambiente
+
+Projetos profissionais sempre controlam versão do runtime.
+
+3️⃣ Inicialização do Projeto NestJS
+npx @nestjs/cli new . --package-manager pnpm --skip-install --skip-git
+📌 Explicação dos parâmetros
+
+--package-manager pnpm → melhor performance e controle de dependências
+
+--skip-install → instalação manual posterior
+
+--skip-git → controle do git já iniciado manualmente
+
+🧠 Por que criar na pasta existente?
+
+Permite manter:
+
+Estrutura de repositório limpa
+
+Controle total da configuração inicial
+
+Separação entre criação e versionamento
+
+4️⃣ Configuração do PNPM
+echo "strict-peer-dependencies=false" > .npmrc
+pnpm install
+🧠 Importância
+
+Resolve conflitos comuns em peer dependencies
+
+Mantém build previsível
+
+Evita falhas em CI
+
+PNPM melhora:
+
+Velocidade
+
+Determinismo
+
+Organização de node_modules
+
+5️⃣ Estrutura Arquitetural Base
+
+Estrutura definida:
+
+src/
  ├── domain/           # Entidades e regras de negócio puras
- ├── application/      # Casos de uso e serviços
- ├── infrastructure/   # Implementações (DB, Redis, Pub/Sub)
- ├── interfaces/       # Controllers e DTOs (o "mundo exterior")
- ├── app.module.ts     # O "Root Module" que orquestra as camadas
- └── main.ts           # O ponto de entrada da aplicação (Bootstrap)
+ ├── application/      # Casos de uso
+ ├── infrastructure/   # Implementações técnicas (DB, Redis, Pub/Sub)
+ ├── interfaces/       # Controllers e DTOs
+ ├── app.module.ts     # Root Module
+ └── main.ts           # Bootstrap
+🧠 Explicação das Camadas
+🔵 Domain (Camada Interna)
 
- src/
-├── domain/                  # <--- O Domínio (Camada interna)
-│   ├── user/
-│   │   ├── entities/
-│   │   │   └── user.entity.ts # <--- Pura, com regras de negócio
-│   │   ├── repositories/
-│   │   │   └── user.repository.interface.ts
-│   │   └── value-objects/
-│   ├── ...
-├── application/             # <--- Use Cases, DTOs
-├── infrastructure/          # <--- Mapeamento para BD (TypeORM/Prisma)
-│   ├── persistence/
-│   │   ├── entities/
-│   │   │   └── user.orm-entity.ts # <--- Decorators do DB
-│   │   └── mappers/
-│   │       └── user.mapper.ts
+Contém:
 
-# Install Prisma CLI as a dev dependency
+Entities puras
+
+Regras de negócio
+
+Interfaces de repositório
+
+Value Objects
+
+Não depende de:
+
+NestJS
+
+Prisma
+
+Frameworks
+
+Essa camada é o coração do sistema.
+
+🟢 Application
+
+Contém:
+
+Use Cases
+
+Orquestração de regras
+
+Fluxos de negócio
+
+Depende do Domain, mas não da infraestrutura.
+
+🟡 Infrastructure
+
+Contém:
+
+Implementações concretas
+
+Prisma
+
+Redis
+
+Pub/Sub
+
+Mappers
+
+Essa camada depende das camadas internas.
+
+🔴 Interfaces
+
+Contém:
+
+Controllers HTTP
+
+DTOs
+
+Validação
+
+Exposição de endpoints
+
+É a camada mais externa.
+
+6️⃣ Organização por Contexto (Domain Modular)
+
+Estrutura aplicada:
+
+domain/
+  user/
+    entities/
+      user.entity.ts
+    repositories/
+      user.repository.interface.ts
+    value-objects/
+
+infrastructure/
+  persistence/
+    entities/
+      user.orm-entity.ts
+    mappers/
+      user.mapper.ts
+🧠 Por que organizar por contexto?
+
+Em vez de organizar por tipo técnico:
+
+❌ entities/
+❌ repositories/
+
+Organizamos por responsabilidade de negócio:
+
+✔ user/
+✔ workout/
+✔ diet/
+
+Isso facilita:
+
+Escalabilidade
+
+Manutenção
+
+Navegação
+
+Evolução para DDD mais avançado
+
+7️⃣ Separação Entity vs ORM Entity
+
+Exemplo conceitual:
+
+Domain Entity
+
+user.entity.ts
+
+Pura
+
+Sem decorators
+
+Contém regras de negócio
+
+ORM Entity
+
+user.orm-entity.ts
+
+Contém decorators Prisma/TypeORM
+
+Mapeamento para banco
+
+🧠 Por que separar?
+
+Isso evita:
+
+Acoplamento ao banco
+
+Vazamento de dependência
+
+Dificuldade em testar
+
+Dificuldade em trocar ORM
+
+Essa separação é um diferencial técnico forte.
+
+8️⃣ Instalação do Prisma
 pnpm install prisma --save-dev
-
-# Install Prisma Client
 pnpm install @prisma/client
+🧠 Por que usar Prisma?
 
- 
+Tipagem forte
+
+Migrations consistentes
+
+Produtividade
+
+Mercado atual valoriza
+
+Mas ele ficará isolado na camada Infrastructure.
+
+9️⃣ Resultado Arquitetural Atual
+
+O projeto agora possui:
+
+✔ Base Clean Architecture
+✔ Separação clara de camadas
+✔ Domínio puro
+✔ Preparação para testes isolados
+✔ Estrutura escalável
+✔ Infra pronta para integrar banco
+
+🔥 O que isso demonstra tecnicamente
+
+Esse setup demonstra:
+
+Entendimento de arquitetura
+
+Pensamento modular
+
+Separação de responsabilidades
+
+Capacidade de projetar sistemas escaláveis
+
+Maturidade acima da média de pleno comum
+
+📌 Próximos Passos Naturais
+
+Criar Entities puras no domínio
+
+Criar contratos de repositório
+
+Implementar UseCases
+
+Integrar Prisma na infraestrutura
+
+Criar primeiro endpoint
