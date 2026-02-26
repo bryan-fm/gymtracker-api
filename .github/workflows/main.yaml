@@ -8,10 +8,10 @@ jobs:
   test-and-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout do código
+      - name: Checkout do código (App)
         uses: actions/checkout@v4
 
-      # 1. ETAPA DE TESTES (Garante que o index.html não quebre)
+      # 1. ETAPA DE TESTES
       - name: Instalar Node.js e PNPM
         uses: pnpm/action-setup@v2
         with:
@@ -21,9 +21,9 @@ jobs:
         run: pnpm install
 
       - name: Rodar Testes
-        run: pnpm test # O build só continua se os testes passarem
+        run: pnpm test
 
-      # 2. LOGIN SEGURO (Usando Secrets)
+      # 2. LOGIN SEGURO
       - name: Login no Docker Hub
         uses: docker/login-action@v3
         with:
@@ -36,17 +36,29 @@ jobs:
         with:
           context: .
           push: true
+          # Corrigi aqui para incluir o nome da imagem antes da tag
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/gymtracker-api:${{ github.sha }}
 
-      # 4. ATUALIZAÇÃO DO YAML (O segredo do ArgoCD)
-      - name: Atualizar Manifesto K8s
+      # 4. ATUALIZAÇÃO DO REPO DE INFRA
+      - name: Checkout do repo de Infra
+        uses: actions/checkout@v4
+        with:
+          # Substitua pelo seu usuário e nome do repo de infraestrutura
+          repository: bryan-fm/gymtracker-infra 
+          # O PAT_TOKEN que você criou nas configurações do GitHub
+          token: ${{ secrets.PAT_TOKEN }}
+          # Salva o repo de infra em uma pasta separada para não misturar com o código da App
+          path: infra-repo
+
+      - name: Atualizar Manifesto K8s no outro repo
         run: |
-          # Substitui a imagem antiga pela nova com o hash do commit atual
+          cd infra-repo
+          # O comando sed agora aponta para o caminho dentro da pasta 'infra-repo'
+          # Ajuste 'k8s/deployment.yaml' se o arquivo estiver em outra pasta no repo de infra
           sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/gymtracker-api:${{ github.sha }}|g" k8s/deployment.yaml
           
-          # Comita a mudança de volta para o repositório
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add k8s/deployment.yaml
-          git commit -m "chore: update image tag to ${{ github.sha }}"
+          git commit -m "chore: update gymtracker-api image to ${{ github.sha }}"
           git push
