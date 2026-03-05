@@ -1,4 +1,4 @@
-import { Kind } from "generated/prisma";
+import { Kind } from '@prisma/client';
 
 export interface CreateWorkoutDTO {
   name: string;
