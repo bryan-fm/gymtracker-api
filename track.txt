@@ -293,3 +293,164 @@ Implementar UseCases
 Integrar Prisma na infraestrutura
 
 Criar primeiro endpoint
+
+
+📄 Documentação: Pipeline CI/CD (GitHub Actions + ArgoCD)
+
+Esta documentação descreve o fluxo de automação para a GymTracker API, integrando o build do código com a atualização da infraestrutura no Kubernetes.
+1. Arquitetura do Fluxo
+
+O processo utiliza a separação de repositórios para garantir segurança e organização:
+
+    Repo App: Contém o código-fonte (Node.js/Pnpm) e o Workflow de CI.
+
+    Repo Infra: Contém os manifestos Kubernetes (deployment.yaml) que o ArgoCD monitora.
+
+    Docker Hub: Armazena as imagens imutáveis geradas em cada build.
+
+2. Configuração de Credenciais (GitHub Secrets)
+
+Para que o workflow funcione sem expor senhas, configuramos os seguintes Secrets no repositório da aplicação:
+Secret	Descrição
+DOCKERHUB_USERNAME	Seu usuário no Docker Hub.
+DOCKERHUB_TOKEN	Token de acesso (PAT) gerado no Docker Hub.
+PAT_TOKEN	GitHub Personal Access Token com permissão repo para editar o repositório de infra.
+3. O Workflow de CI/CD (.github/workflows/main.yml)
+
+O arquivo de automação realiza quatro etapas críticas:
+
+    Testes Automáticos: Roda o pnpm test para garantir que o código (e o index.html) esteja íntegro. Se falhar, o deploy é abortado.
+
+    Docker Build: Utiliza o Dockerfile com suporte a pnpm para criar uma imagem leve baseada em Alpine.
+
+    Tagging Imutável: Cada imagem é tagueada com o ${{ github.sha }} (hash do commit), evitando conflitos de cache.
+
+    Sincronização de Infra: O workflow clona o repositório de infraestrutura, atualiza a tag da imagem via sed e faz o push das alterações.
+
+4. Integração com ArgoCD
+
+O ArgoCD na sua VPS da Contabo está configurado para:
+
+    Monitorar o Repositório de Infraestrutura.
+
+    Detectar mudanças no k8s/deployment.yaml.
+
+    Realizar o Pull da nova imagem do Docker Hub e atualizar os Pods no cluster.
+
+    Dica Sênior: Lembre-se que o ArgoCD tem um delay de até 3 minutos para detectar o commit. Para acelerar, você pode usar o botão Refresh na UI ou configurar um Webhook no GitHub para avisar o ArgoCD instantaneamente.
+
+5. Manutenção e Troubleshooting
+
+    Erro de Permissão no Push: Verifique se o PAT_TOKEN ainda é válido e tem permissão de escrita no repo de infra.
+
+    ImagePullBackOff: Verifique se o nome da imagem no Docker Hub está exatamente igual ao que o sed escreveu no deployment.yaml.
+
+    NodePort não acessível: Verifique se a porta 30080 (ou a configurada) está liberada no firewall da Contabo (ufw allow).
+
+
+🛠️ Anatomia do Workflow (main.yml)
+
+O arquivo é escrito em YAML e dividido em seções lógicas:
+1. Gatilho (Trigger)
+YAML
+
+on:
+  push:
+    branches: [ "main" ]
+
+    O que faz: Define que qualquer git push na branch main dispara a esteira.
+
+    Dica: Em ambientes maiores, você poderia adicionar pull_request, para testar o código antes mesmo de ele entrar na branch principal.
+
+2. Ambiente de Execução (Job)
+YAML
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    runs-on: O GitHub "aluga" uma máquina virtual Linux zerada para rodar seus comandos. Nada do que você instalou no seu PC está lá, por isso precisamos instalar tudo do zero no passo seguinte.
+
+3. Instalação e Testes (Garantia de Qualidade)
+YAML
+
+    steps:
+      - name: Checkout do código (App)
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js e PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Rodar Testes
+        run: pnpm test
+
+    actions/checkout: Baixa o código do seu repositório para dentro da máquina virtual.
+
+    pnpm/action-setup: Como o Ubuntu não vem com o pnpm, essa "Action" pronta da comunidade configura o ambiente para você.
+
+    pnpm test: Se um teste falhar aqui, o GitHub para tudo. Isso evita que você suba um erro para a produção na Contabo.
+
+4. Construção da Imagem (Docker)
+YAML
+
+      - name: Login no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build e Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gymtracker-api:${{ github.sha }}
+
+    secrets.*: O GitHub busca os valores que você salvou no "cofre" (Settings > Secrets).
+
+    github.sha: Esta é uma variável mágica. Ela pega o ID único do seu commit (ex: 5f93b4c).
+
+        Por que isso é sênior? Se você usasse sempre a tag :latest, o Kubernetes poderia achar que a imagem é a mesma e não baixar a versão nova. Com o hash do commit, a imagem é sempre nova e única.
+
+5. O "Pulo do Gato": Integração entre Repositórios
+YAML
+
+      - name: Checkout do repo de Infra
+        uses: actions/checkout@v4
+        with:
+          repository: seu-usuario/seu-repo-de-infra 
+          token: ${{ secrets.PAT_TOKEN }}
+          path: infra-repo
+
+    path: infra-repo: Criamos uma pasta separada para não sobrescrever os arquivos da sua API. Agora a máquina virtual tem dois repositórios abertos ao mesmo tempo.
+
+6. Atualização do Manifesto (Sed e Git Push)
+YAML
+
+      - name: Atualizar Manifesto K8s
+        run: |
+          cd infra-repo
+          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/gymtracker-api:${{ github.sha }}|g" k8s/deployment.yaml
+          
+          git config --global user.name "GitHub Action"
+          git add k8s/deployment.yaml
+          git commit -m "chore: update image to ${{ github.sha }}"
+          git push
+
+    sed -i: Este comando Linux entra no arquivo deployment.yaml, procura a linha que começa com image: e substitui tudo pelo novo endereço da imagem que acabamos de buildar.
+
+    git push: O GitHub Actions "digita" os comandos de git para você, enviando a alteração para o repositório de infraestrutura.
+
+🚀 Resumo do Funcionamento Total
+
+    Você faz git push no código.
+
+    O GitHub valida o código (testes).
+
+    O GitHub empacota o código (Docker build) e joga no Docker Hub.
+
+    O GitHub avisa o Repositório de Infra: "Ei, a nova versão é a ${{ github.sha }}".
+
+    O ArgoCD vê que o Repositório de Infra mudou e atualiza o seu servidor na Contabo.

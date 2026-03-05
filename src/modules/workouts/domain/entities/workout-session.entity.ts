@@ -1,4 +1,5 @@
-import { Workout } from "./workout.entity";
+import Workout from "./workout.entity";
+
 
 export type WeekDay = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
 

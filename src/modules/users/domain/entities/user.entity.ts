@@ -1,6 +1,6 @@
 export type UserRole = 'USER' | 'ADMIN';
 
-export class User {
+class User {
   constructor(
     public readonly id: string,
     public readonly name: string,
@@ -18,3 +18,5 @@ export class User {
     return this.password;
   }
 }
+
+export default User;

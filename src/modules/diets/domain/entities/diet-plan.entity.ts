@@ -1,4 +1,4 @@
-import { WeekDay } from "src/domain/workout/entities/workout-session.entity";
+import { WeekDay } from "src/modules/workouts/domain/entities/workout-session.entity";
 import { Meal } from "./meal.entity";
 
 export class DietPlan {

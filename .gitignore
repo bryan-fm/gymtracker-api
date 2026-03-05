@@ -44,3 +44,7 @@ Thumbs.db
 # Coverage
 /coverage
 /.nyc_output
+
+/generated/prisma
+
+/generated/prisma

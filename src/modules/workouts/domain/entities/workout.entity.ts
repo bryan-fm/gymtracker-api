@@ -1,8 +1,8 @@
 export type Kind = 'BICEPS' | 'TRICPES' | 'LEGS' | 'CHEST' | 'SHOULDER'| 'BACK' | 'CARDIO' ;
 
-export class Workout {
+class Workout {
   constructor(
-    public readonly id: string,
+    public readonly id: number,
     public readonly name: string,
     public readonly description: string,
     public readonly image: string,
@@ -11,3 +11,5 @@ export class Workout {
     public readonly weight :number
   ) {}
 }
+
+export default Workout;

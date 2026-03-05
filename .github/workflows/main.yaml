@@ -55,7 +55,7 @@ jobs:
           cd infra-repo
           # O comando sed agora aponta para o caminho dentro da pasta 'infra-repo'
           # Ajuste 'k8s/deployment.yaml' se o arquivo estiver em outra pasta no repo de infra
-          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/gymtracker-api:${{ github.sha }}|g" apps/backend/deployment.yaml
+          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/gymtracker-api:${{ github.sha }}|g" k8s/deployment.yaml
           
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
