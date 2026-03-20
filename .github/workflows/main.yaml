@@ -59,18 +59,16 @@ jobs:
         run: |
           cd infra-repo
           
-          # DEBUG: Verifique se a variável está no ambiente (deve aparecer ***)
-          echo "A variável DATABASE_URL está definida? [ ${DATABASE_URL:0:3}... ]"
-          
-          # 1. Atualizamos a imagem usando sed (como você já fazia)
+          # 1. Atualiza a Imagem
           sed -i "s|image: .*|image: ${DOCKER_USER}/gymtracker-api:${IMAGE_TAG}|g" apps/backend/deployment.yaml
           
-          # 2. SEGURO: Usamos envsubst para trocar o placeholder ${DATABASE_URL} no arquivo
-          # Isso permite que você tenha env: - name: DATABASE_URL value: "${DATABASE_URL}" no YAML
-          sed -i "s|\${DATABASE_URL}|${DATABASE_URL}|g" apps/backend/deployment.yaml
+          # 2. Atualiza a DATABASE_URL
+          # Aqui buscamos a linha que contém o placeholder e substituímos pelo valor real com aspas
+          sed -i "s|value: \"\${DATABASE_URL}\"|value: \"${DATABASE_URL}\"|g" apps/backend/deployment.yaml
 
+          # DEBUG: Vamos ver se agora o valor mudou (deve aparecer value: "***")
           echo "CONTEÚDO DO MANIFESTO PÓS-SUBSTITUIÇÃO:"
-          cat apps/backend/deployment.yaml
+          grep "value:" apps/backend/deployment.yaml
           
           # 3. Commit e Push
           git config --global user.name "GitHub Action"
