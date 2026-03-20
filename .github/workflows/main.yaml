@@ -64,7 +64,7 @@ jobs:
           
           # 2. SEGURO: Usamos envsubst para trocar o placeholder ${DATABASE_URL} no arquivo
           # Isso permite que você tenha env: - name: DATABASE_URL value: "${DATABASE_URL}" no YAML
-          envsubst '${DATABASE_URL}' < apps/backend/deployment.yaml > deployment.tmp
+          envsubst < apps/backend/deployment.yaml > deployment.tmp
           mv deployment.tmp apps/backend/deployment.yaml
           
           # 3. Commit e Push
