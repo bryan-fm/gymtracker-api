@@ -66,6 +66,9 @@ jobs:
           # Isso permite que você tenha env: - name: DATABASE_URL value: "${DATABASE_URL}" no YAML
           envsubst < apps/backend/deployment.yaml > deployment.tmp
           mv deployment.tmp apps/backend/deployment.yaml
+
+          echo "CONTEÚDO DO MANIFESTO PÓS-SUBSTITUIÇÃO:"
+          cat apps/backend/deployment.yaml
           
           # 3. Commit e Push
           git config --global user.name "GitHub Action"
