@@ -59,13 +59,15 @@ jobs:
         run: |
           cd infra-repo
           
+          # DEBUG: Verifique se a variável está no ambiente (deve aparecer ***)
+          echo "A variável DATABASE_URL está definida? [ ${DATABASE_URL:0:3}... ]"
+          
           # 1. Atualizamos a imagem usando sed (como você já fazia)
           sed -i "s|image: .*|image: ${DOCKER_USER}/gymtracker-api:${IMAGE_TAG}|g" apps/backend/deployment.yaml
           
           # 2. SEGURO: Usamos envsubst para trocar o placeholder ${DATABASE_URL} no arquivo
           # Isso permite que você tenha env: - name: DATABASE_URL value: "${DATABASE_URL}" no YAML
-          envsubst < apps/backend/deployment.yaml > deployment.tmp
-          mv deployment.tmp apps/backend/deployment.yaml
+          sed -i "s|\${DATABASE_URL}|${DATABASE_URL}|g" apps/backend/deployment.yaml
 
           echo "CONTEÚDO DO MANIFESTO PÓS-SUBSTITUIÇÃO:"
           cat apps/backend/deployment.yaml
