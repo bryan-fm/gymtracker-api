@@ -21,4 +21,8 @@ export class PrismaWorkoutRepository implements IWorkoutRepository {
       },
     });
   }
+
+  async findAll(): Promise<Workout[] | []> {
+    return await this.prisma.workout.findMany();
+  }
 }

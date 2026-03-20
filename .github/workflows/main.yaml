@@ -51,14 +51,25 @@ jobs:
           path: infra-repo
 
       - name: Atualizar Manifesto K8s no outro repo
+        env:
+          # Injetamos o Segredo do GitHub como variável de ambiente para o envsubst
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          IMAGE_TAG: ${{ github.sha }}
+          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
           cd infra-repo
-          # O comando sed agora aponta para o caminho dentro da pasta 'infra-repo'
-          # Ajuste 'k8s/deployment.yaml' se o arquivo estiver em outra pasta no repo de infra
-          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/gymtracker-api:${{ github.sha }}|g" apps/backend/deployment.yaml
           
+          # 1. Atualizamos a imagem usando sed (como você já fazia)
+          sed -i "s|image: .*|image: ${DOCKER_USER}/gymtracker-api:${IMAGE_TAG}|g" apps/backend/deployment.yaml
+          
+          # 2. SEGURO: Usamos envsubst para trocar o placeholder ${DATABASE_URL} no arquivo
+          # Isso permite que você tenha env: - name: DATABASE_URL value: "${DATABASE_URL}" no YAML
+          envsubst '${DATABASE_URL}' < apps/backend/deployment.yaml > deployment.tmp
+          mv deployment.tmp apps/backend/deployment.yaml
+          
+          # 3. Commit e Push
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add apps/backend/deployment.yaml
-          git commit -m "chore: update gymtracker-api image to ${{ github.sha }}"
+          git commit -m "chore: update gymtracker-api image and envs to ${IMAGE_TAG}"
           git push

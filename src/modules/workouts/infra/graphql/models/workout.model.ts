@@ -19,4 +19,7 @@ export class WorkoutModel {
 
   @Field(() => Float)
   weight: number;
+
+  @Field({ nullable: true })
+  image?: string;
 }

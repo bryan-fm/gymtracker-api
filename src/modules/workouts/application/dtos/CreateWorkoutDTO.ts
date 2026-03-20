@@ -4,7 +4,7 @@ export interface CreateWorkoutDTO {
   name: string;
   description: string;
   image: string;
-  kind: Kind
+  kind: Kind;
   reps: number;
   weight: number;
 }
