@@ -65,10 +65,6 @@ jobs:
           # 2. Atualiza a DATABASE_URL
           # Aqui buscamos a linha que contém o placeholder e substituímos pelo valor real com aspas
           sed -i "s|value: \"\${DATABASE_URL}\"|value: \"${DATABASE_URL}\"|g" apps/backend/deployment.yaml
-
-          # DEBUG: Vamos ver se agora o valor mudou (deve aparecer value: "***")
-          echo "CONTEÚDO DO MANIFESTO PÓS-SUBSTITUIÇÃO:"
-          grep "value:" apps/backend/deployment.yaml
           
           # 3. Commit e Push
           git config --global user.name "GitHub Action"
