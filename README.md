@@ -1,136 +1,56 @@
-# 🏋️ GymTracker API
+# GymTracker API
 
-Event-driven backend for a Gym & Diet tracking application built with **NestJS**, following **Clean Architecture principles**.
+## Status
 
-This project demonstrates production-ready backend patterns including authentication, caching, messaging, CI/CD and GitOps deployment.
+🚧 Em desenvolvimento
 
----
+Este projeto está sendo utilizado para estudo e aplicação prática de conceitos de arquitetura backend, GraphQL e engenharia de software.
 
-## 🏗 Architecture Overview
+API GraphQL para gerenciamento de treinos desenvolvida com NestJS, Prisma e PostgreSQL.
 
-The application follows a simplified Clean Architecture:
+O projeto foi criado para estudo de arquitetura backend, GraphQL e boas práticas de organização de código.
 
+## Funcionalidades
 
-src/
-├── domain/ # Business entities & repository interfaces
-├── application/ # Use cases
-├── infrastructure/ # Database, cache, pubsub implementations
-├── interfaces/ # Controllers & DTOs
+### Workouts
 
+- Cadastro de treinos
+- Listagem de treinos
+- Classificação por grupo muscular
+- Persistência em PostgreSQL
 
-### Architectural Principles Applied
-
-- Dependency Inversion
-- Separation of Concerns
-- Framework-independent business logic
-- Repository Pattern
-- Service Layer Pattern
-- Explicit DTO usage
-
----
-
-## 🚀 Features
-
-### 🔐 Authentication
-
-- JWT access token
-- Refresh token
-- Role-Based Access Control (RBAC)
-
-### 🏋️ Workouts
-
-- Create workout
-- List workouts (cursor-based pagination)
-- Workout check-in
-- Workout session tracking
-
-### 🥗 Diet Plans
-
-- Create diet plan
-- Register meals
-- Nutritional tracking
-
----
-
-## ⚡ Performance & Scalability
-
-- Redis cache-aside strategy
-- Strategic TTL configuration
-- Cache invalidation on mutation
-- Indexed database queries
-- Avoidance of N+1 queries
-- Structured logging
-
----
-
-## 📡 Event-Driven Check-in
-
-When a workout check-in occurs:
-
-1. Workout session is persisted
-2. `WORKOUT_CHECKED_IN` event is published to Google Cloud Pub/Sub
-3. Consumer service processes the event asynchronously
-
-This design enables decoupled processing and horizontal scalability.
-
----
-
-## 🛠 Tech Stack
+## Tecnologias
 
 - NestJS
+- GraphQL
+- Prisma
 - PostgreSQL
-- Redis
-- Google Cloud Pub/Sub
+- Pino Logger
 - Docker
-- GitHub Actions
-- Kubernetes (GKE)
-- ArgoCD
-- Pino (structured logging)
 
----
+## Arquitetura
 
-## 🐳 Running Locally
+O projeto utiliza uma estrutura inspirada em Clean Architecture:
 
-bash
-docker-compose up --build
+src/
+├── modules
+│ ├── workouts
+│ │ ├── application
+│ │ ├── domain
+│ │ ├── infra
 
-## Services started:
+Principais conceitos:
 
- - API → http://localhost:3000
- - PostgreSQL
- - Redis
- - Check-in Consumer
+- Repository Pattern
+- Use Cases
+- DTOs
+- Dependency Injection
 
-## 🧪 Running Tests
- - npm run test
- # Includes:
+## Próximos Passos
 
- - Unit tests (use cases)
- - Integration tests (HTTP layer)
- - Repository mocking
- - Error scenario coverage
-
-## Deployment
-# Deployment strategy:
- - Docker multi-stage builds
- - GitHub Actions CI pipeline
- - Image push to Artifact Registry
- - GitOps deployment using ArgoCD
- - Running on GKE
-
-## 📊 Logging & Observability
-
- - Structured JSON logs including:
- - traceId
- - userId
- - event type
- - timestamp
- - Logs are centralized in Google Cloud Logging.
-
-## 🧠 Architectural Decisions
-
- - Clean Architecture for maintainability
- - Pub/Sub for asynchronous decoupling
- - Cache-aside for read-heavy endpoints
- - Modular monolith design
- - Local Docker environment mirroring production setup
+- Autenticação JWT
+- Redis
+- Check-ins
+- Dietas
+- Testes automatizados
+- Mensageria
