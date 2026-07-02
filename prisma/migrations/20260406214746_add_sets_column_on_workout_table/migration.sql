@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Workout" ADD COLUMN     "sets" INTEGER NOT NULL DEFAULT 0;

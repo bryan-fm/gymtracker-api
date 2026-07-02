@@ -6,14 +6,22 @@ import { WorkoutsModule } from 'src/modules/workouts/workouts.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { LoggerModule } from 'nestjs-pino';
+import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthResolver } from 'src/modules/auth/auth.resolver';
+import { JwtStrategy } from 'src/modules/auth/infrastructure/strategies/jwt.strategy';
+import { AuthModule } from 'src/modules/auth/auth.module';
 
 @Module({
   imports: [
     PrismaModule,
     WorkoutsModule,
+    AuthModule,
+    JwtModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
+      context: ({ req }) => ({ req }),
     }),
     LoggerModule.forRoot({
       pinoHttp: {
@@ -30,8 +38,11 @@ import { LoggerModule } from 'nestjs-pino';
             : undefined,
       },
     }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthResolver, JwtStrategy],
 })
 export class AppModule {}

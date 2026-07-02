@@ -7,4 +7,6 @@ export interface CreateWorkoutDTO {
   kind: Kind;
   reps: number;
   weight: number;
+  sets: number;
+  userId: string;
 }

@@ -20,6 +20,8 @@ export class CreateWorkoutUseCase {
       data.kind as any, // Você pode querer mapear isso para um Enum interno
       data.reps,
       data.weight,
+      data.sets,
+      data.userId,
     );
     return await this.workoutRepository.save(workout);
   }

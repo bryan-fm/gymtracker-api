@@ -23,12 +23,24 @@ enum Kind {
 }
 
 model Workout {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  name        String
-  description String
-  image       String
-  kind        Kind
-  reps        Int
-  weight      Float
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  name          String
+  description   String
+  image         String
+  kind          Kind
+  reps          Int
+  weight        Float
+  sets          Int @default(0)
+  userId        String
+  user          User   @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String   
+  password  String
+  createdAt DateTime @default(now())
+  workouts  Workout[]
 }

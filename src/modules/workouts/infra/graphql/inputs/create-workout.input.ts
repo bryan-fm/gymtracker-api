@@ -24,4 +24,11 @@ export class CreateWorkoutInput {
 
   @Field()
   weight: number;
+
+  @Field()
+  sets: number;
+
+  @Field()
+  userId: string;
+
 }

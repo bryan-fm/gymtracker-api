@@ -18,11 +18,21 @@ export class PrismaWorkoutRepository implements IWorkoutRepository {
         kind: workout.kind,
         reps: workout.reps,
         weight: workout.weight,
+        sets: workout.sets,
+        userId: workout.userId,
       },
     });
   }
 
   async findAll(): Promise<Workout[] | []> {
     return await this.prisma.workout.findMany();
+  }
+
+  async findByUserId(userId: string): Promise<Workout[] | []> {
+    return await this.prisma.workout.findMany({
+      where: {
+        userId: userId,
+      },
+    });
   }
 }

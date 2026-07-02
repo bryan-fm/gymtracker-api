@@ -10,8 +10,8 @@ export class GetWorkoutUseCase {
     private workoutRepository: IWorkoutRepository,
   ) {}
 
-  async execute(): Promise<WorkoutModel[]> {
-    const workouts: Workout[] = await this.workoutRepository.findAll();
+  async execute(userId: string): Promise<WorkoutModel[]> {
+    const workouts: Workout[] = await this.workoutRepository.findByUserId(userId);
     return workouts;
   }
 }

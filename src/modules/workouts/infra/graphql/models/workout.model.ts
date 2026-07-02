@@ -20,6 +20,12 @@ export class WorkoutModel {
   @Field(() => Float)
   weight: number;
 
+  @Field(() => Int)
+  sets: number;
+
   @Field({ nullable: true })
   image?: string;
+
+  @Field(() => String)
+  userId?: string;
 }

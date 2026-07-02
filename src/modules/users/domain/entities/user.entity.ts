@@ -6,7 +6,6 @@ class User {
     public readonly name: string,
     public readonly email: string,
     private password: string,
-    public readonly role: UserRole,
     public readonly createdAt: Date,
   ) {}
 

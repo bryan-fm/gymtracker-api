@@ -31,6 +31,7 @@ Arquivo: `prisma/schema.prisma`
   - kind: Kind
   - reps: Int
   - weight: Float
+  - sets: Int
 
 ## GraphQL — operações disponíveis
 Arquivo: `src/modules/workouts/infra/graphql/resolvers/workout.resolver.ts`
@@ -50,6 +51,7 @@ mutation CreateWorkout($input: CreateWorkoutInput!) {
     kind
     reps
     weight
+    sets
   }
 }
 
@@ -62,6 +64,7 @@ mutation CreateWorkout($input: CreateWorkoutInput!) {
     "kind": "BICEPS",
     "reps": 12,
     "weight": 20.5
+    "sets: 3
   }
 }
 ```

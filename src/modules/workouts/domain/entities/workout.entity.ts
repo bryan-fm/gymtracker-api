@@ -8,7 +8,9 @@ class Workout {
     public readonly image: string,
     public readonly kind: Kind,
     public readonly reps: number,
-    public readonly weight :number
+    public readonly weight: number,
+    public readonly sets: number,
+    public readonly userId: string,
   ) {}
 }
 
