@@ -20,6 +20,6 @@ import { AuthService } from './application/services/auth.service';
     AuthResolver,
     UsersService,
   ],
-  exports: [AuthService],
+  exports: [AuthService, UsersService, AuthResolver, GqlAuthGuard],
 })
 export class AuthModule {}
